@@ -22,6 +22,7 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
+  "https://video-app-three-sooty.vercel.app",
 ];
 
 app.use(
