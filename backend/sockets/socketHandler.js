@@ -64,7 +64,11 @@ export function initSocket(io) {
       });
 
       // Send the new participant the current roster
-      socket.emit("room-participants", participantsList(currentRoomId));
+      const otherParticipants = participantsList(currentRoomId).filter(
+        (participant) => participant.socketId !== socket.id
+      );
+
+      socket.emit("room-participants", otherParticipants);
     });
 
     // ---- WebRTC signaling relay ----

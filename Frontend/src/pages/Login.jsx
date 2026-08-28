@@ -31,8 +31,8 @@ export default function Login() {
     setLoading(true);
     try {
       await login(form);
-    } catch {
-      setFormError("Something went wrong. Please try again.");
+    } catch (error) {
+      setFormError(error.message || "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
