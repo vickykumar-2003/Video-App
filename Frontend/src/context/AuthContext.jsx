@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL;
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
@@ -17,7 +18,7 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(
     async ({ email, password }) => {
-      const response = await fetch("http://localhost:5000/api/auth/login", {
+const response = await fetch(`${API_URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -47,7 +48,7 @@ export function AuthProvider({ children }) {
 
   const register = useCallback(
     async ({ name, email, password }) => {
-      const response = await fetch("http://localhost:5000/api/auth/register", {
+const response = await fetch(`${API_URL}/api/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
