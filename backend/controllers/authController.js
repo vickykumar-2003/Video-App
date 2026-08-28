@@ -1,0 +1,87 @@
+import User from "../models/User.js";
+import { generateToken } from "../utils/generateToken.js";
+
+function initials(name = "") {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase())
+    .join("");
+}
+
+// @route  POST /api/auth/register
+export async function registerUser(req, res, next) {
+  try {
+    const { name, email, password } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "Name, email and password are required" });
+    }
+    if (password.length < 8) {
+      return res.status(400).json({ message: "Password must be at least 8 characters" });
+    }
+
+    const existing = await User.findOne({ email: email.toLowerCase() });
+    if (existing) {
+      return res.status(409).json({ message: "An account with this email already exists" });
+    }
+
+    const user = await User.create({
+      name,
+      email,
+      password,
+      avatarInitials: initials(name),
+    });
+
+    return res.status(201).json({
+      user: user.toSafeObject(),
+      token: generateToken(user._id),
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+// @route  POST /api/auth/login
+export async function loginUser(req, res, next) {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password are required" });
+    }
+
+    const user = await User.findOne({ email: email.toLowerCase() }).select("+password");
+    if (!user || !(await user.comparePassword(password))) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+
+    return res.json({
+      user: user.toSafeObject(),
+      token: generateToken(user._id),
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+// @route  GET /api/auth/me
+export async function getMe(req, res) {
+  res.json({ user: req.user.toSafeObject() });
+}
+
+// @route  PATCH /api/auth/me
+export async function updateMe(req, res, next) {
+  try {
+    const { name, email } = req.body;
+    if (name) req.user.name = name;
+    if (email) req.user.email = email;
+    if (name) req.user.avatarInitials = initials(name);
+
+    await req.user.save();
+    res.json({ user: req.user.toSafeObject() });
+  } catch (err) {
+    next(err);
+  }
+}
