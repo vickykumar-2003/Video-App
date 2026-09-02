@@ -12,7 +12,7 @@ import { useAuth } from "../context/AuthContext.jsx";
 import { useToast } from "../components/common/Toast.jsx";
 import { copyToClipboard } from "../utils/helpers.js";
 
-const SOCKET_URL = import.meta.env.VITE_API_URL;
+const SOCKET_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 export default function MeetingRoom() {
   const { roomId } = useParams();
